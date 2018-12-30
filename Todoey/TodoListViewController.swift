@@ -14,10 +14,17 @@ class TodoListViewController: UITableViewController {
     // Mark: - Properties
     var  itemArray = ["One", "Two", "Three"]
     
+    // Data Persistance 1
+    let defaults = UserDefaults.standard
     
     //MARK:- View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Data Persistance 3
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
 
     
@@ -32,6 +39,10 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //What will happens once the user press the + button
             self.itemArray.append(textField.text!)
+            
+            // This saves user todos 2
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            
             self.tableView.reloadData()
         }
         
