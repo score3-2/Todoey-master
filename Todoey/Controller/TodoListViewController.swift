@@ -26,10 +26,10 @@ class TodoListViewController: UITableViewController {
         newItem.done = true
         itemArray.append(newItem)
         
-//        // Data Persistance 3
-//        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-//            itemArray = items
-//        }
+        // Data Persistance 3
+        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+            itemArray = items
+        }
     }
 
     
@@ -38,12 +38,13 @@ class TodoListViewController: UITableViewController {
         
         // Instance of UIAlert
         var textField = UITextField()
-        
+        // New Alert
         let alert = UIAlertController(title: "Add New Todohoy", message: "", preferredStyle: .alert)
-    
+        // Anction this start when you press the + button
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
-            //What will happens once the user press the + button
+            // What will happens once the user press the + button
+            // Instantiate the Item class and then use the text property to add a new item.
             let newItem = Item()
             newItem.title = textField.text!
             newItem.done = true
