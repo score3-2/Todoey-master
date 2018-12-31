@@ -12,7 +12,7 @@ class TodoListViewController: UITableViewController {
 
     
     // Mark: - Properties
-    var  itemArray = ["One", "Two", "Three"]
+    var  itemArray = [Item]()
     
     // Data Persistance 1
     let defaults = UserDefaults.standard
@@ -21,10 +21,15 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Data Persistance 3
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-            itemArray = items
-        }
+        let newItem = Item()
+        newItem.title = "This is a Todo"
+        newItem.done = true
+        itemArray.append(newItem)
+        
+//        // Data Persistance 3
+//        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+//            itemArray = items
+//        }
     }
 
     
@@ -37,8 +42,12 @@ class TodoListViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Todohoy", message: "", preferredStyle: .alert)
     
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            
             //What will happens once the user press the + button
-            self.itemArray.append(textField.text!)
+            let newItem = Item()
+            newItem.title = textField.text!
+            newItem.done = true
+            self.itemArray.append(newItem)
             
             // This saves user todos 2
             self.defaults.set(self.itemArray, forKey: "TodoListArray")
@@ -80,7 +89,13 @@ extension TodoListViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = itemArray[indexPath.row].title
+        
+        if itemArray[indexPath.row].done == true {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+        }
         
         return cell
     }
@@ -94,12 +109,12 @@ extension TodoListViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemArray[indexPath.row])
         
-        // Checkmark
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        // CheckMark
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+
+        
+        tableView.reloadData()
+        
         // Diselect Method animation
         tableView.deselectRow(at: indexPath, animated: true)
     }
