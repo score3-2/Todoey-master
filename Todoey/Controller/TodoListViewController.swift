@@ -17,14 +17,22 @@ class TodoListViewController: UITableViewController {
     // Data Persistance 1
     let defaults = UserDefaults.standard
     
+    
     //MARK:- View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let newItem = Item()
         newItem.title = "This is a Todo"
-        newItem.done = true
         itemArray.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "This is a 2 do"
+        itemArray.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "This is a 3 do"
+        itemArray.append(newItem3)
         
         // Data Persistance 3
         if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
@@ -82,21 +90,23 @@ extension TodoListViewController {
         return 1
     }
     
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return itemArray.count
     }
     
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row].title
+        // Instance of itemArray . & setting its title as the textLabel on the cell.
+        let item = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
         
-        if itemArray[indexPath.row].done == true {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        // This checks the cell for a checkMark if the user taps the cell the .checkmark = true. Else = .none
+        cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
     }
