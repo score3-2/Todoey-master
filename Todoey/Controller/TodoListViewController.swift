@@ -12,13 +12,18 @@ class TodoListViewController: UITableViewController {
 
     
     // Mark: - Properties
+    
     var  itemArray = [Item]()
     
     // Data Persistance 1
     let defaults = UserDefaults.standard
     
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+
+    
     
     //MARK:- View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -55,13 +60,10 @@ class TodoListViewController: UITableViewController {
             // Instantiate the Item class and then use the text property to add a new item.
             let newItem = Item()
             newItem.title = textField.text!
-            newItem.done = true
+            newItem.done = false
             self.itemArray.append(newItem)
-            
-            // This saves user todos 2
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            
-            self.tableView.reloadData()
+                
+            self.saveItems()
         }
         
         alert.addTextField { (alertTextField) in
@@ -73,6 +75,22 @@ class TodoListViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
 
+    }
+    
+    // You call this to save the todos
+    func saveItems() {
+        // This saves user todos 2
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: self.dataFilePath!)
+        } catch {
+            print("Error encoding items array \(error)")
+        }
+        
+        self.tableView.reloadData()
+        
     }
     
     
@@ -123,8 +141,7 @@ extension TodoListViewController {
         // CheckMark
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
 
-        
-        tableView.reloadData()
+        saveItems()
         
         // Diselect Method animation
         tableView.deselectRow(at: indexPath, animated: true)
