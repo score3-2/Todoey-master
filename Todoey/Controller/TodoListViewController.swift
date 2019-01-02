@@ -7,28 +7,27 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
     
     
-    //MARK:- Properties
-    
     var  itemArray = [Item]()
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    // Data Persistance I. Create the instance of userdefaults
-    let defaults = UserDefaults.standard
     
-    // Data Persistance II. Call the filemanager to create a plist with a unique key (String). You'll call the dataFilePath on the encoding / decoding procces.
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
-
-    
-    //MARK:- View Life Cycle
+    //                         MARK:- View Life Cycle
+    ////
+    ///////
+    ///////////////
+    //////////////////////
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Data Persistance IV
-        loadItems()
+//        loadItems()
         
     }
     
@@ -44,8 +43,8 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
             // What will happens once the user press the + button
-            // Instantiate the Item class and then use the text property to add a new item.
-            let newItem = Item()
+            
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
             self.itemArray.append(newItem)
@@ -65,39 +64,47 @@ class TodoListViewController: UITableViewController {
         
     }
     
-    //MARK:- NSCoder
+    
+    //                              MARK:- NSCodable
+    ////
+    ///////
+    ///////////////
+    //////////////////////
+    
     
     // NS Encoder - Data Persistance III
     func saveItems() {
-        // This saves user todos 2
-        let encoder = PropertyListEncoder()
-        
+     
         do {
-            let data = try encoder.encode(self.itemArray)
-            try data.write(to: self.dataFilePath!)
+         try context.save()
         } catch {
             print("Error encoding items array \(error)")
         }
         self.tableView.reloadData()
     }
     
-    // NS Decoder Data Persistance IV
-    func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-               itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                 print("Error decoding item array \(error)")
-            }
-        }
-    }
+//    // NS Decoder Data Persistance IV
+//    func loadItems() {
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error decoding item array \(error)")
+//            }
+//        }
+//    }
     
 }
 
 
 
-//MARK:- Table View Data Source
+/////////////////
+///////
+//                       MARK:- Table View Data Source
+//////
+///////////////
+
 extension TodoListViewController {
     
     
@@ -130,7 +137,12 @@ extension TodoListViewController {
 
 
 
-//MARK:- Table View Delegate
+/////////////////
+///////
+//                       MARK:- Table View Delegate
+//////
+///////////////
+
 extension TodoListViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
