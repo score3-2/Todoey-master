@@ -12,9 +12,10 @@ import CoreData
 class TodoListViewController: UITableViewController {
     
     
-    var  itemArray = [Item]()
+    var itemArray = [Item]()
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     
     
     //                         MARK:- View Life Cycle
@@ -26,9 +27,8 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Data Persistance IV
-//        loadItems()
-        
+        loadItems()
+        print(dataFilePath)
     }
     
     
@@ -72,28 +72,26 @@ class TodoListViewController: UITableViewController {
     //////////////////////
     
     
-    // NS Encoder - Data Persistance III
+    //MARK:- Model Manipulation Methods
     func saveItems() {
-     
+        
         do {
-         try context.save()
+            try context.save()
         } catch {
             print("Error encoding items array \(error)")
         }
         self.tableView.reloadData()
     }
     
-//    // NS Decoder Data Persistance IV
-//    func loadItems() {
-//        if let data = try? Data(contentsOf: dataFilePath!) {
-//            let decoder = PropertyListDecoder()
-//            do {
-//                itemArray = try decoder.decode([Item].self, from: data)
-//            } catch {
-//                print("Error decoding item array \(error)")
-//            }
-//        }
-//    }
+    
+    func loadItems() {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Errorfetching data from context \(error)")
+        }
+    }
     
 }
 
