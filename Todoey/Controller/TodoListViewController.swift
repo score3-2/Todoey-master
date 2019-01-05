@@ -17,22 +17,18 @@ class TodoListViewController: UITableViewController {
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     
-    
-    //                         MARK:- View Life Cycle
-    ////
-    ///////
-    ///////////////
-    //////////////////////
+    // MARK:- View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadItems()
-        print(dataFilePath)
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        loadItems(with: request)
     }
     
     
     // MARK: - Actions
+    
     @IBAction func addButtonPressed(_ sender: Any) {
         
         // Instance of UIAlert
@@ -65,14 +61,8 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    //                              MARK:- NSCodable
-    ////
-    ///////
-    ///////////////
-    //////////////////////
+    // MARK:- NSCodable -- Model Manipulation Methods
     
-    
-    //MARK:- Model Manipulation Methods
     func saveItems() {
         
         do {
@@ -84,24 +74,21 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    func loadItems() {
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+        
         do {
             itemArray = try context.fetch(request)
         } catch {
             print("Errorfetching data from context \(error)")
         }
+        tableView.reloadData()
     }
     
-}
+}//
 
 
 
-/////////////////
-///////
-//                       MARK:- Table View Data Source
-//////
-///////////////
+// MARK:- Table View Data Source
 
 extension TodoListViewController {
     
@@ -131,20 +118,16 @@ extension TodoListViewController {
         
         return cell
     }
-}
-
-
-
-/////////////////
-///////
-//                       MARK:- Table View Delegate
-//////
-///////////////
-
-extension TodoListViewController {
+    
+    
+    
+    // MARK:- Table View Delegate
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemArray[indexPath.row])
+        
+        //        context.delete(itemArray[indexPath.row])
+        //        itemArray.remove(at: indexPath.row)
         
         // CheckMark
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
@@ -154,6 +137,28 @@ extension TodoListViewController {
         // Diselect Method animation
         tableView.deselectRow(at: indexPath, animated: true)
     }
-}
+}//
 
 
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItems(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+}//
